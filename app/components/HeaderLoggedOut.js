@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react"
 import Axios from "axios"
 
 function HeaderLoggedOut(props) {
-  Axios.defaults.baseURL = "http://127.0.0.1:8080/"
-
   const [username, setUsername] = useState()
   const [password, setPassword] = useState()
 
