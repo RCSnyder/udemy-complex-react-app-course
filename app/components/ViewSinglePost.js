@@ -3,6 +3,7 @@ import Page from "./Page"
 import Axios from "axios"
 import { useParams, Link } from "react-router-dom"
 import LoadingDotsIcon from "./LoadingDotsIcon"
+import ReactMarkdown from "react-markdown"
 
 function ViewSinglePost(props) {
   const [isLoading, setIsLoading] = useState(true)
@@ -70,7 +71,9 @@ function ViewSinglePost(props) {
         on {dateFormatted}
       </p>
 
-      <div className="body-content">{post.body}</div>
+      <div className="body-content">
+        <ReactMarkdown children={post.body} />
+      </div>
     </Page>
   )
 }
