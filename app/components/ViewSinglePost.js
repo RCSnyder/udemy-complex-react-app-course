@@ -10,12 +10,12 @@ function ViewSinglePost(props) {
   const { id } = useParams()
 
   useEffect(() => {
-    const ourRequest = Axios.CancelToken.source()
+    const controller = new AbortController()
 
     async function fetchPost() {
       try {
         const response = await Axios.get(`/post/${id}`, {
-          cancelToken: ourRequest.token
+          signal: controller.signal
         })
         setPost(response.data)
         setIsLoading(false)
@@ -25,7 +25,7 @@ function ViewSinglePost(props) {
     }
     fetchPost()
     return () => {
-      ourRequest.cancel()
+      controller.abort()
     }
   }, [])
 

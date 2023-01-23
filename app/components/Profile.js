@@ -14,7 +14,7 @@ function Profile() {
     isFollowing: false,
     counts: { postCount: "", followerCount: "", followingCount: "" }
   })
-  const ourRequest = Axios.CancelToken.source()
+  const controller = new AbortController()
 
   useEffect(() => {
     async function fetchData() {
@@ -25,17 +25,17 @@ function Profile() {
             token: appState.user.token
           },
           {
-            cancelToken: ourRequest.token
+            signal: controller.signal
           }
         )
         setProfileData(response.data)
       } catch (e) {
-        console.log("There was a problem.")
+        console.log("There was a problem or the request was cancelled.")
       }
     }
     fetchData()
     return () => {
-      ourRequest.cancel()
+      controller.abort()
     }
   }, [])
 
