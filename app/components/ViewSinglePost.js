@@ -4,6 +4,7 @@ import Axios from "axios"
 import { useParams, Link } from "react-router-dom"
 import LoadingDotsIcon from "./LoadingDotsIcon"
 import ReactMarkdown from "react-markdown"
+import { Tooltip as ReactTooltip } from "react-tooltip"
 
 function ViewSinglePost(props) {
   const [isLoading, setIsLoading] = useState(true)
@@ -47,16 +48,23 @@ function ViewSinglePost(props) {
       <div className="d-flex justify-content-between">
         <h2>{post.title}</h2>
         <span className="pt-2">
-          <Link
-            to={`/profile/${post.author.username}`}
+          <a
+            href="#"
+            data-tip="Edit"
+            data-for="edit"
             className="text-primary mr-2"
-            title="Edit"
           >
             <i className="fas fa-edit"></i>
-          </Link>
-          <a className="delete-post-button text-danger" title="Delete">
+          </a>
+          <ReactTooltip id="edit" className="custom-tooltip" />{" "}
+          <a
+            data-tip="Delete"
+            data-for="delete"
+            className="delete-post-button text-danger"
+          >
             <i className="fas fa-trash"></i>
           </a>
+          <ReactTooltip id="delete" className="custom-tooltip" />
         </span>
       </div>
 
