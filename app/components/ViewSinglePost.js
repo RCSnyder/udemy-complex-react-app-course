@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import Page from "./Page"
 import Axios from "axios"
 import { useParams, Link } from "react-router-dom"
+import LoadingDotsIcon from "./LoadingDotsIcon"
 
 function ViewSinglePost(props) {
   const [isLoading, setIsLoading] = useState(true)
@@ -9,22 +10,29 @@ function ViewSinglePost(props) {
   const { id } = useParams()
 
   useEffect(() => {
+    const ourRequest = Axios.CancelToken.source()
+
     async function fetchPost() {
       try {
-        const response = await Axios.get(`/post/${id}`)
+        const response = await Axios.get(`/post/${id}`, {
+          cancelToken: ourRequest.token
+        })
         setPost(response.data)
         setIsLoading(false)
       } catch (e) {
-        console.log("There was a problem")
+        console.log("There was a problem or the request was cancelled.")
       }
     }
     fetchPost()
+    return () => {
+      ourRequest.cancel()
+    }
   }, [])
 
   if (isLoading)
     return (
       <Page title="...">
-        <div>Loading...</div>
+        <LoadingDotsIcon />
       </Page>
     )
 
