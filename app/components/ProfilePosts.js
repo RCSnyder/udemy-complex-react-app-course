@@ -9,22 +9,22 @@ function ProfilePosts() {
   const [posts, setPosts] = useState([])
 
   useEffect(() => {
-    const ourRequest = Axios.CancelToken.source()
+    const controller = new AbortController()
 
     async function fetchPosts() {
       try {
         const response = await Axios.get(`/profile/${username}/posts`, {
-          cancelToken: ourRequest.token
+          signal: controller.signal
         })
         setPosts(response.data)
         setIsLoading(false)
       } catch (e) {
-        console.log("There was a problem")
+        console.log("There was a problem or the request was cancelled.")
       }
     }
     fetchPosts()
     return () => {
-      ourRequest.cancel()
+      controller.abort()
     }
   }, [])
 
