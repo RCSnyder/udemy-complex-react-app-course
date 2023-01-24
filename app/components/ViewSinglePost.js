@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from "react"
 import Page from "./Page"
-import Axios from "axios"
 import { useParams, Link } from "react-router-dom"
+import Axios from "axios"
 import LoadingDotsIcon from "./LoadingDotsIcon"
 import ReactMarkdown from "react-markdown"
 import { Tooltip as ReactTooltip } from "react-tooltip"
+import "react-tooltip/dist/react-tooltip.css"
 
-function ViewSinglePost(props) {
+function ViewSinglePost() {
+  const { id } = useParams()
   const [isLoading, setIsLoading] = useState(true)
   const [post, setPost] = useState()
-  const { id } = useParams()
 
   useEffect(() => {
-    const controller = new AbortController()
+    const ourRequest = Axios.CancelToken.source()
 
     async function fetchPost() {
       try {
         const response = await Axios.get(`/post/${id}`, {
-          signal: controller.signal
+          cancelToken: ourRequest.token
         })
         setPost(response.data)
         setIsLoading(false)
@@ -27,7 +28,7 @@ function ViewSinglePost(props) {
     }
     fetchPost()
     return () => {
-      controller.abort()
+      ourRequest.cancel()
     }
   }, [])
 
@@ -50,21 +51,21 @@ function ViewSinglePost(props) {
         <span className="pt-2">
           <a
             href="#"
-            data-tip="Edit"
-            data-for="edit"
+            data-tooltip-content="Edit"
+            id="edit"
             className="text-primary mr-2"
           >
             <i className="fas fa-edit"></i>
           </a>
-          <ReactTooltip id="edit" className="custom-tooltip" />{" "}
+          <ReactTooltip anchorId="edit" className="custom-tooltip" />{" "}
           <a
-            data-tip="Delete"
-            data-for="delete"
+            data-tooltip-content="Delete"
+            id="delete"
             className="delete-post-button text-danger"
           >
             <i className="fas fa-trash"></i>
           </a>
-          <ReactTooltip id="delete" className="custom-tooltip" />
+          <ReactTooltip anchorId="delete" className="custom-tooltip" />
         </span>
       </div>
 

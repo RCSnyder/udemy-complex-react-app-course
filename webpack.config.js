@@ -16,18 +16,28 @@ module.exports = {
     },
     liveReload: false,
     hot: true,
-    historyApiFallback: {index: "index.html"}
+    historyApiFallback: { index: "index.html" }
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.js|\.jsx$/,
         exclude: /(node_modules)/,
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-react", ["@babel/preset-env", { targets: { node: "12" } }]]
+            presets: [
+              "@babel/preset-react",
+              ["@babel/preset-env", { targets: { node: "12" } }]
+            ]
           }
+        }
+      },
+      {
+        test: /\.css$/i,
+        loader: "css-loader",
+        options: {
+          modules: true
         }
       }
     ]
