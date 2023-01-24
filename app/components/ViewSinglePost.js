@@ -4,8 +4,7 @@ import { useParams, Link } from "react-router-dom"
 import Axios from "axios"
 import LoadingDotsIcon from "./LoadingDotsIcon"
 import ReactMarkdown from "react-markdown"
-import { Tooltip as ReactTooltip } from "react-tooltip"
-import "react-tooltip/dist/react-tooltip.css"
+import ReactTooltip from "react-tooltip"
 
 function ViewSinglePost() {
   const { id } = useParams()
@@ -51,21 +50,21 @@ function ViewSinglePost() {
         <span className="pt-2">
           <a
             href="#"
-            data-tooltip-content="Edit"
-            id="edit"
+            data-tip="Edit"
+            data-for="edit"
             className="text-primary mr-2"
           >
             <i className="fas fa-edit"></i>
           </a>
-          <ReactTooltip anchorId="edit" className="custom-tooltip" />{" "}
+          <ReactTooltip id="edit" className="custom-tooltip" />{" "}
           <a
-            data-tooltip-content="Delete"
-            id="delete"
+            data-tip="Delete"
+            data-for="delete"
             className="delete-post-button text-danger"
           >
             <i className="fas fa-trash"></i>
           </a>
-          <ReactTooltip anchorId="delete" className="custom-tooltip" />
+          <ReactTooltip id="delete" className="custom-tooltip" />
         </span>
       </div>
 
