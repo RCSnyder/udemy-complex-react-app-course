@@ -27,13 +27,17 @@ function ViewSinglePost() {
         draft.isFetching = false
         return
       case "titleChange":
+        draft.title.hasError = false
         draft.title.value = action.value
         return
       case "bodyChange":
+        draft.body.hasError = false
         draft.body.value = action.value
         return
       case "submitRequest":
-        draft.sendCount++
+        if (!draft.title.hasError && !draft.body.hasError) {
+          draft.sendCount++
+        }
         return
       case "saveRequestStarted":
         draft.isSaving = true
@@ -41,12 +45,26 @@ function ViewSinglePost() {
       case "saveRequestFinished":
         draft.isSaving = false
         return
+      case "titleRules": // different rules here
+        if (!action.value.trim()) {
+          draft.title.hasError = true
+          draft.title.message = "You must provide a title"
+        }
+        return
+      case "bodyRules": // different rules here
+        if (!action.value.trim()) {
+          draft.body.hasError = true
+          draft.body.message = "You must provide body content"
+        }
+        return
     }
   }
   const [state, dispatch] = useImmerReducer(ourReducer, originalState)
 
   function submitHandler(e) {
     e.preventDefault()
+    dispatch({ type: "bodyRules", value: state.body.value })
+    dispatch({ type: "titleRules", value: state.title.value })
     dispatch({ type: "submitRequest" })
   }
 
@@ -118,6 +136,9 @@ function ViewSinglePost() {
             onChange={e =>
               dispatch({ type: "titleChange", value: e.target.value })
             }
+            onBlur={e =>
+              dispatch({ type: "titleRules", value: e.target.value })
+            }
             defaultValue={state.title.value}
             autoFocus
             name="title"
@@ -127,6 +148,11 @@ function ViewSinglePost() {
             placeholder=""
             autoComplete="off"
           />
+          {state.title.hasError && (
+            <div className="alert alert-danger small liveValidateMessage">
+              {state.title.message}
+            </div>
+          )}
         </div>
 
         <div className="form-group">
@@ -137,12 +163,18 @@ function ViewSinglePost() {
             onChange={e =>
               dispatch({ type: "bodyChange", value: e.target.value })
             }
+            onBlur={e => dispatch({ type: "bodyRules", value: e.target.value })}
             name="body"
             id="post-body"
             className="body-content tall-textarea form-control"
             type="text"
             defaultValue={state.body.value}
           />
+          {state.body.hasError && (
+            <div className="alert alert-danger small liveValidateMessage">
+              {state.body.message}
+            </div>
+          )}
         </div>
 
         <button disabled={state.isSaving} className="btn btn-primary">
