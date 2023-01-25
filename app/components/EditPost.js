@@ -5,9 +5,11 @@ import { useParams, Link } from "react-router-dom"
 import Axios from "axios"
 import LoadingDotsIcon from "./LoadingDotsIcon"
 import StateContext from "../StateContext"
+import DispatchContext from "../DispatchContext"
 
 function ViewSinglePost() {
   const appState = useContext(StateContext)
+  const appDispatch = useContext(DispatchContext)
 
   const originalState = {
     title: { value: "", hasError: false, message: "" },
@@ -32,6 +34,12 @@ function ViewSinglePost() {
         return
       case "submitRequest":
         draft.sendCount++
+        return
+      case "saveRequestStarted":
+        draft.isSaving = true
+        return
+      case "saveRequestFinished":
+        draft.isSaving = false
         return
     }
   }
@@ -63,6 +71,7 @@ function ViewSinglePost() {
 
   useEffect(() => {
     if (state.sendCount) {
+      dispatch({ type: "saveRequestStarted" })
       const ourRequest = Axios.CancelToken.source()
 
       async function setPost() {
@@ -79,8 +88,8 @@ function ViewSinglePost() {
               cancelToken: ourRequest.token
             }
           )
-          alert("Congrats, post updated")
-          //   dispatch({ type: "fetchComplete", value: response.data })
+          dispatch({ type: "saveRequestFinished" })
+          appDispatch({ type: "flashMessage", value: "Post was updated." })
         } catch (e) {
           console.log("There was a problem or the request was cancelled.")
         }
@@ -136,7 +145,9 @@ function ViewSinglePost() {
           />
         </div>
 
-        <button className="btn btn-primary">Save Updates</button>
+        <button disabled={state.isSaving} className="btn btn-primary">
+          Save Updates
+        </button>
       </form>
     </Page>
   )
