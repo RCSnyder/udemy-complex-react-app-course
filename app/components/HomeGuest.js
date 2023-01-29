@@ -1,11 +1,13 @@
-import React, { useState } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import Page from "./Page"
 import Axios from "axios"
 import { useImmerReducer } from "use-immer"
 import { CSSTransition } from "react-transition-group"
-import { useEffect } from "react"
+import DispatchContext from "../DispatchContext"
 
 function HomeGuest() {
+  const appDispatch = useContext(DispatchContext)
+
   const initialState = {
     username: {
       value: "",
@@ -44,7 +46,7 @@ function HomeGuest() {
         ) {
           draft.username.hasErrors = true
           draft.username.message =
-            "Username can only contain letters and numbers"
+            "Username can only contain letters and numbers."
         }
         return
       case "usernameAfterDelay":
@@ -52,17 +54,17 @@ function HomeGuest() {
           draft.username.hasErrors = true
           draft.username.message = "Username must be at least 3 characters."
         }
-        if (!draft.hasErrors) {
+        if (!draft.username.hasErrors && !action.noRequest) {
           draft.username.checkCount++
         }
         return
       case "usernameUniqueResults":
         if (action.value) {
-          draft.email.hasErrors = true
-          draft.email.isUnique = false
-          draft.email.message = "That email is already taken."
+          draft.username.hasErrors = true
+          draft.username.isUnique = false
+          draft.username.message = "That username is already taken."
         } else {
-          draft.email.isUnique = true
+          draft.username.isUnique = true
         }
         return
       case "emailImmediately":
@@ -74,11 +76,19 @@ function HomeGuest() {
           draft.email.hasErrors = true
           draft.email.message = "You must provide a valid email address."
         }
-        if (!draft.email.hasErrors) {
+        if (!draft.email.hasErrors && !action.noRequest) {
           draft.email.checkCount++
         }
         return
       case "emailUniqueResults":
+        if (action.value) {
+          draft.email.hasErrors = true
+          draft.email.isUnique = false
+          draft.email.message = "That username is already taken."
+        } else {
+          draft.email.isUnique = true
+        }
+        return
         return
       case "passwordImmediately":
         draft.password.hasErrors = false
@@ -95,6 +105,15 @@ function HomeGuest() {
         }
         return
       case "submitForm":
+        if (
+          !draft.username.hasErrors &&
+          draft.username.isUnique &&
+          !draft.email.hasErrors &&
+          draft.email.isUnique &&
+          !draft.password.hasErrors
+        ) {
+          draft.submitCount++
+        }
         return
     }
   }
@@ -172,8 +191,57 @@ function HomeGuest() {
     }
   }, [state.email.checkCount])
 
+  useEffect(() => {
+    if (state.submitCount) {
+      // send axios request here
+      const controller = new AbortController()
+
+      async function fetchResults() {
+        try {
+          const response = await Axios.post(
+            "/register",
+            {
+              username: state.username.value,
+              email: state.email.value,
+              password: state.password.value
+            },
+            { signal: controller.signal }
+          )
+          console.log(response.data)
+          appDispatch({ type: "login", data: response.data })
+          appDispatch({
+            type: "flashMessage",
+            value: "Congratulations! Welcome to Your New Account!"
+          })
+        } catch (e) {
+          console.log("There was a problem or the request was cancelled.")
+        }
+      }
+      fetchResults()
+      return () => controller.abort()
+    }
+  }, [state.submitCount])
+
   function handleSubmit(e) {
     e.preventDefault()
+    dispatch({ type: "usernameImmediately", value: state.username.value })
+    dispatch({
+      type: "usernameAfterDelay",
+      value: state.username.value,
+      noRequest: true
+    })
+
+    dispatch({
+      type: "emailImmediately",
+      value: state.email.value,
+      noRequest: true
+    })
+    dispatch({ type: "emailAfterDelay", value: state.email.value })
+
+    dispatch({ type: "passwordImmediately", value: state.password.value })
+    dispatch({ type: "passwordAfterDelay", value: state.password.value })
+
+    dispatch({ type: "submitForm" })
   }
 
   return (
