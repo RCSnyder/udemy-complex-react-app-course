@@ -6,6 +6,7 @@ import StateContext from "../StateContext"
 import ProfilePosts from "./ProfilePosts"
 import { useImmer } from "use-immer"
 import ProfileFollowers from "./ProfileFollowers"
+import ProfileFollowing from "./ProfileFollowing"
 
 function Profile() {
   const { username } = useParams()
@@ -175,7 +176,7 @@ function Profile() {
       <Routes>
         <Route path="" element={<ProfilePosts />}></Route>
         <Route path="followers" element={<ProfileFollowers />}></Route>
-        <Route path="following" element={<ProfilePosts />}></Route>
+        <Route path="following" element={<ProfileFollowing />}></Route>
       </Routes>
     </Page>
   )
