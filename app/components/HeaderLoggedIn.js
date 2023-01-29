@@ -30,6 +30,7 @@ function HeaderLoggedIn(props) {
         <i className="fas fa-search"></i>
       </a>
       <span
+        onClick={() => appDispatch({ type: "toggleChat" })}
         data-for="chat"
         data-tip="Chat"
         className="mr-2 header-chat-icon text-white"
