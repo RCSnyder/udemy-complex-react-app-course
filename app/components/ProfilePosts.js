@@ -26,7 +26,7 @@ function ProfilePosts() {
     return () => {
       controller.abort()
     }
-  }, [])
+  }, [username])
 
   if (isLoading) return <LoadingDotsIcon />
 
