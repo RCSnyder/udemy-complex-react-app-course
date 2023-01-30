@@ -33,9 +33,21 @@ function ProfilePosts() {
 
   return (
     <div className="list-group">
-      {posts.map(post => {
-        ;<Post noAuthor={true} post={post} id={post._id} />
-      })}
+      {posts.length > 0 &&
+        posts.map(post => {
+          return <Post noAuthor={true} post={post} key={post._id} />
+        })}
+      {posts.length == 0 && appState.user.username == username && (
+        <p className="lead text-muted text-center">
+          You haven&rsquo;t created any posts yet;{" "}
+          <Link to="/create-post">create one now!</Link>
+        </p>
+      )}
+      {posts.length == 0 && appState.user.username != username && (
+        <p className="lead text-muted text-center">
+          {username} hasn&rsquo;t created any posts yet.
+        </p>
+      )}
     </div>
   )
 }
